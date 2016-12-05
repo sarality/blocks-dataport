@@ -22,6 +22,7 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
   private final FormDataConverter<T> dataConverter;
 
   private T value;
+  private FormData data;
 
   public FormDataFileLineParser(List<FormField> fieldList, FormDataConverter<T> dataConverter) {
     this.fieldList = fieldList;
@@ -30,7 +31,7 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
 
   @Override
   public T parse(String line, String[] values) {
-    FormData data = new FormData();
+    data = new FormData();
     int ctr = 0;
     for (String value : values) {
       FormField field = fieldList.get(ctr);
@@ -45,5 +46,9 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
   @Override
   public T getData() {
     return value;
+  }
+
+  FormData getFormData() {
+    return data;
   }
 }
