@@ -1,5 +1,8 @@
 package com.sarality.file;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,10 +14,11 @@ import java.io.InputStreamReader;
  * @author abhideep@ (Abhideep Singh)
  */
 public class DelimitedFileReader {
+  public static final Logger logger = LoggerFactory.getLogger(DelimitedFileReader.class);
   private final String separator;
   private final String filePath;
 
-  public DelimitedFileReader(String separator, String filePath) {
+  public DelimitedFileReader(String filePath, String separator) {
     this.separator = separator;
     this.filePath = filePath;
   }
@@ -29,17 +33,16 @@ public class DelimitedFileReader {
         String[] rowData = line.split(separator);
         lineProcessor.processLine(line, rowData);
       }
-    }
-    catch (IOException ex) {
+    } catch (IOException ex) {
+      logger.error("Failed to Read Delimited File", ex);
       // handle exception
-    }
-    finally {
+    } finally {
       try {
         if (inputStream != null) {
           inputStream.close();
         }
-      }
-      catch (IOException e) {
+      } catch (IOException e) {
+        logger.error("Failed to Close Delimited File", e);
         // handle exception
       }
     }
