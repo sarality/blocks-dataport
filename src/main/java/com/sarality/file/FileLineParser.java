@@ -7,6 +7,8 @@ package com.sarality.file;
  */
 public interface FileLineParser<T> {
 
+  void initColumns(String line, String[] values);
+
   T parse(String line, String[] values);
 
   T getData();

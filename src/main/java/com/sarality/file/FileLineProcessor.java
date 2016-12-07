@@ -7,5 +7,7 @@ package com.sarality.file;
  */
 public interface FileLineProcessor {
 
+  void processHeader(String line, String[] values);
+
   void processLine(String line, String[] values);
 }
