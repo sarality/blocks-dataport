@@ -21,6 +21,11 @@ public class FormDataLogger implements FileLineProcessor {
   }
 
   @Override
+  public void processHeader(String line, String[] values) {
+    lineParser.initColumns(line, values);
+  }
+
+  @Override
   public void processLine(String line, String[] values) {
     lineParser.parse(line, values);
     FormData data = lineParser.getFormData();

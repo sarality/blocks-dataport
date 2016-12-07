@@ -25,13 +25,19 @@ public class DelimitedFileReader {
 
   public void readAll(FileLineProcessor lineProcessor) {
     FileInputStream inputStream = null;
+    boolean processedHeaders = false;
     try {
       inputStream = new FileInputStream(filePath);
       BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
       String line;
       while ((line = reader.readLine()) != null) {
         String[] rowData = line.split(separator);
-        lineProcessor.processLine(line, rowData);
+        if (!processedHeaders) {
+          lineProcessor.processHeader(line, rowData);
+          processedHeaders = true;
+        } else {
+          lineProcessor.processLine(line, rowData);
+        }
       }
     } catch (IOException ex) {
       logger.error("Failed to Read Delimited File", ex);
