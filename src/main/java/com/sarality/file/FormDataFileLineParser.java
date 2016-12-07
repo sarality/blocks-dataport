@@ -10,8 +10,10 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Parses the line read from a file and generates a Data object for the values.
@@ -24,20 +26,28 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
 
   private final List<FormField> fieldList;
   private final FormDataConverter<T> dataConverter;
+
   private final List<String> columnNameList = new ArrayList<>();
+  private final Set<String> optionalFieldNameSet = new HashSet<>();
   private final Map<String, FormField> fieldNameMap = new HashMap<>();
+
 
   private T value;
   private FormData data;
 
-  public FormDataFileLineParser(List<FormField> fieldList, FormDataConverter<T> dataConverter) {
+  public FormDataFileLineParser(List<FormField> fieldList, List<FormField> optionalFieldList,
+      FormDataConverter<T> dataConverter) {
     this.fieldList = fieldList;
+    if (optionalFieldList != null) {
+      for (FormField field : optionalFieldList) {
+        optionalFieldNameSet.add(field.getName());
+      }
+    }
     this.dataConverter = dataConverter;
     for (FormField field : fieldList) {
       fieldNameMap.put(field.getName(), field);
     }
   }
-
 
   @Override
   public void initColumns(String line, String[] values) {
@@ -51,9 +61,14 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
     for (String value : values) {
       String columnName = columnNameList.get(ctr);
       FormField field = fieldNameMap.get(columnName);
-      data.addValue(field, value);
+      if (value.isEmpty() && optionalFieldNameSet.contains(columnName)) {
+        data.addValue(field, null);
+      } else {
+        data.addValue(field, value);
+      }
+      ctr++;
     }
-    logger.info("Extracting data object for Form Data {}", data);
+    logger.info("Extracting data object for Form Data {}", data.displayString(fieldList));
 
     value = dataConverter.generateDomainData(data);
     return value;
