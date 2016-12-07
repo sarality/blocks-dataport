@@ -24,6 +24,11 @@ public class TablePersister<T> implements FileLineProcessor {
   }
 
   @Override
+  public void processHeader(String line, String[] values) {
+    lineParser.initColumns(line, values);
+  }
+
+  @Override
   public void processLine(String line, String[] values) {
     T data = lineParser.parse(line, values);
     storeData(data);
