@@ -1,4 +1,4 @@
-package com.sarality.file;
+package com.sarality.dataport.file;
 
 import com.sarality.db.Table;
 import com.sarality.db.TableRegistry;

@@ -1,4 +1,4 @@
-package com.sarality.file;
+package com.sarality.dataport.file;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

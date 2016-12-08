@@ -1,4 +1,4 @@
-package com.sarality.file;
+package com.sarality.dataport.file;
 
 /**
  * Interface for classes that process a line tha is read from a file.
