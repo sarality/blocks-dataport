@@ -1,4 +1,4 @@
-package com.sarality.file;
+package com.sarality.dataport.file;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

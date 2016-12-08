@@ -1,4 +1,4 @@
-package com.sarality.file;
+package com.sarality.dataport.file;
 
 /**
  * Parses a line in a file to a data object.

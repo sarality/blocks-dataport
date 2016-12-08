@@ -1,4 +1,4 @@
-package com.sarality.file;
+package com.sarality.dataport.file;
 
 /**
  * Import Data provided by the tab or comma separated file.
