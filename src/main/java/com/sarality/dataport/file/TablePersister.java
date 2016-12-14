@@ -2,6 +2,8 @@ package com.sarality.dataport.file;
 
 import com.sarality.db.Table;
 import com.sarality.db.TableRegistry;
+import com.sarality.error.ApplicationException;
+import com.sarality.error.ApplicationParseException;
 
 /**
  * Converts File data to FormData and then saves it to a Table.
@@ -29,7 +31,7 @@ public class TablePersister<T> implements FileLineProcessor {
   }
 
   @Override
-  public void processLine(String line, String[] values) {
+  public void processLine(String line, String[] values) throws ApplicationParseException, ApplicationException {
     T data = lineParser.parse(line, values);
     storeData(data);
   }
