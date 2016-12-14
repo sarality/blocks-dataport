@@ -69,7 +69,7 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
       }
       ctr++;
     }
-    logger.info("Extracting data object for Form Data {}", data.displayString(fieldList));
+    logger.debug("Extracting data object for Form Data {}", data.displayString(fieldList));
 
     value = dataConverter.generateDomainData(data);
     List<String> parseErrorFieldNameList = data.getParseErrorFieldNames();
