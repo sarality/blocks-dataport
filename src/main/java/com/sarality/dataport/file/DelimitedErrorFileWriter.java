@@ -79,14 +79,14 @@ public class DelimitedErrorFileWriter implements FileLineErrorProcessor {
     writeToFile(builder.toString());
   }
 
-  public void setHeaders(String line, String[] values) {
+  void setHeaders(String line, String[] values) {
     writeToFile(line);
   }
 
   private void writeToFile(String line) {
     try {
       bufferedWriter.newLine();
-      logger.warn("Writing line to file {} ", line);
+      logger.debug("Writing line to file {} ", line);
       bufferedWriter.write(line);
       bufferedWriter.flush();
     } catch (IOException e) {
