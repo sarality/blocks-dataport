@@ -26,7 +26,7 @@ public class DelimitedFileReader {
     this.filePath = filePath;
   }
 
-  public void readAll(FileLineProcessor lineProcessor, FileLineErrorProcessor errorProcessor) {
+  public void readAll(FileLineProcessor lineProcessor, DelimitedErrorFileWriter errorProcessor) {
     FileInputStream inputStream = null;
     boolean processedHeaders = false;
     try {
