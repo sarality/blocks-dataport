@@ -1,5 +1,8 @@
 package com.sarality.dataport.file;
 
+import com.sarality.error.ApplicationException;
+import com.sarality.error.ApplicationParseException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,15 +18,15 @@ import java.io.InputStreamReader;
  */
 public class DelimitedFileReader {
   public static final Logger logger = LoggerFactory.getLogger(DelimitedFileReader.class);
-  private final String separator;
+  private final Delimiter delimiter;
   private final String filePath;
 
-  public DelimitedFileReader(String filePath, String separator) {
-    this.separator = separator;
+  public DelimitedFileReader(String filePath, Delimiter delimiter) {
+    this.delimiter = delimiter;
     this.filePath = filePath;
   }
 
-  public void readAll(FileLineProcessor lineProcessor) {
+  public void readAll(FileLineProcessor lineProcessor, FileLineErrorProcessor errorProcessor) {
     FileInputStream inputStream = null;
     boolean processedHeaders = false;
     try {
@@ -31,12 +34,19 @@ public class DelimitedFileReader {
       BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
       String line;
       while ((line = reader.readLine()) != null) {
-        String[] rowData = line.split(separator);
+        String[] rowData = line.split(delimiter.getRegularExpression());
         if (!processedHeaders) {
           lineProcessor.processHeader(line, rowData);
           processedHeaders = true;
+          errorProcessor.setHeaders(line, rowData);
         } else {
-          lineProcessor.processLine(line, rowData);
+          try {
+            lineProcessor.processLine(line, rowData);
+          } catch (ApplicationParseException pe) {
+            errorProcessor.processParseErrors(line, rowData, pe.getFieldNames());
+          } catch (ApplicationException e) {
+            errorProcessor.processErrors(line, rowData, e.getErrorCodes());
+          }
         }
       }
     } catch (IOException ex) {
