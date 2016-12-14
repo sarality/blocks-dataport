@@ -36,10 +36,19 @@ public class DelimitedErrorFileWriter implements FileLineErrorProcessor {
 
   public void open() throws IOException {
     DateTime now = DateTime.now(TimeZone.getDefault());
-    String errorFileName = fileName + now.format("_YYYYMMDD_hhmmss");
+    String extension = "";
+    String errorFileName = fileName;
+
+    int extensionIndex = fileName.lastIndexOf('.');
+    if (extensionIndex > 0) {
+      extension = fileName.substring(extensionIndex);
+      errorFileName = fileName.substring(0, extensionIndex - 1);
+    }
+
+    String timeStampedFileName = errorFileName + now.format("_YYYYMMDD_hhmmss") + extension;
     File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     bufferedWriter = new BufferedWriter(new FileWriter(
-        new File(directory.getPath(), errorFileName)));
+        new File(directory.getPath(), timeStampedFileName)));
   }
 
   public void close() throws IOException {
