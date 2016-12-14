@@ -1,5 +1,7 @@
 package com.sarality.dataport.file;
 
+import com.sarality.error.ApplicationException;
+import com.sarality.error.ApplicationParseException;
 import com.sarality.form.FormData;
 
 import org.slf4j.Logger;
@@ -27,10 +29,12 @@ public class FormDataLogger implements FileLineProcessor {
 
   @Override
   public void processLine(String line, String[] values) {
-    lineParser.parse(line, values);
-    FormData data = lineParser.getFormData();
-
-    logger.info("Extracting data object for Form Data {}", data);
-
+    try {
+      lineParser.parse(line, values);
+      FormData data = lineParser.getFormData();
+      logger.info("Extracting data object for Form Data {}", data);
+    } catch (ApplicationParseException ape) {
+      logger.info("Failed to parse line {} for the following Field {} ", line, ape.getFieldNames());
+    }
   }
 }
