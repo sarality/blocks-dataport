@@ -1,7 +1,10 @@
 package com.sarality.dataport.file;
 
+import android.support.annotation.Nullable;
+
 import com.sarality.error.ApplicationException;
 import com.sarality.error.ApplicationParseException;
+import com.sarality.task.TaskProgressPublisher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +24,26 @@ public class DelimitedFileReader {
   private final Delimiter delimiter;
   private final String filePath;
 
+  private final ImportStatus status = new ImportStatus();
+
   public DelimitedFileReader(String filePath, Delimiter delimiter) {
     this.delimiter = delimiter;
     this.filePath = filePath;
   }
 
-  public void readAll(FileLineProcessor lineProcessor, DelimitedErrorFileWriter errorProcessor) {
+  public ImportStatus getStatus() {
+    return status;
+  }
+
+  void readAll(FileLineProcessor lineProcessor, @Nullable DelimitedErrorFileWriter errorProcessor,
+      @Nullable TaskProgressPublisher<ImportStatus> progressPublisher) throws IOException {
     FileInputStream inputStream = null;
     boolean processedHeaders = false;
+    status.resetProcessedCount();
+    if (progressPublisher != null) {
+      progressPublisher.updateProgress(status);
+    }
+
     try {
       inputStream = new FileInputStream(filePath);
       BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -38,20 +53,32 @@ public class DelimitedFileReader {
         if (!processedHeaders) {
           lineProcessor.processHeader(line, rowData);
           processedHeaders = true;
-          errorProcessor.setHeaders(line, rowData);
+          if (errorProcessor != null) {
+            errorProcessor.setHeaders(line, rowData);
+          }
         } else {
           try {
             lineProcessor.processLine(line, rowData);
+            status.incrementSuccessCount();
           } catch (ApplicationParseException pe) {
-            errorProcessor.processParseErrors(line, rowData, pe.getFieldNames());
+            status.incrementErrorCount();
+            if (errorProcessor != null) {
+              errorProcessor.processParseErrors(line, rowData, pe.getFieldNames());
+            }
           } catch (ApplicationException e) {
-            errorProcessor.processErrors(line, rowData, e.getErrorCodes());
+            status.incrementErrorCount();
+            if (errorProcessor != null) {
+              errorProcessor.processErrors(line, rowData, e.getErrorCodes());
+            }
           }
+        }
+        if (progressPublisher != null) {
+          progressPublisher.updateProgress(status);
         }
       }
     } catch (IOException ex) {
       logger.error("Failed to Read Delimited File", ex);
-      // handle exception
+      throw ex;
     } finally {
       try {
         if (inputStream != null) {
