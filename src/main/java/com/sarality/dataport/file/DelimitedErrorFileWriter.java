@@ -70,6 +70,10 @@ public class DelimitedErrorFileWriter implements FileLineErrorProcessor {
     writeToFile(builder.toString());
   }
 
+  public void setHeaders(String line, String[] values) {
+    writeToFile(line);
+  }
+
   private void writeToFile(String line) {
     try {
       bufferedWriter.newLine();

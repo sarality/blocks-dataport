@@ -14,6 +14,4 @@ public interface FileLineErrorProcessor {
   void processErrors(String line, String[] values, List<ErrorCode> errorCodeList);
 
   void processParseErrors(String line, String[] values, List<String> fieldList);
-
-  void setHeaders(String line, String[] values);
 }
