@@ -1,5 +1,6 @@
 package com.sarality.dataport.file;
 
+import com.sarality.error.ApplicationParseException;
 import com.sarality.form.FormData;
 import com.sarality.form.FormDataConverter;
 import com.sarality.form.FormField;
@@ -33,7 +34,7 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
 
 
   private T value;
-  private FormData data;
+  private ErrorCollectingFormData data;
 
   public FormDataFileLineParser(List<FormField> fieldList, List<FormField> optionalFieldList,
       FormDataConverter<T> dataConverter) {
@@ -55,8 +56,8 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
   }
 
   @Override
-  public T parse(String line, String[] values) {
-    data = new FormData();
+  public T parse(String line, String[] values) throws ApplicationParseException {
+    data = new ErrorCollectingFormData();
     int ctr = 0;
     for (String value : values) {
       String columnName = columnNameList.get(ctr);
@@ -71,6 +72,10 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
     logger.info("Extracting data object for Form Data {}", data.displayString(fieldList));
 
     value = dataConverter.generateDomainData(data);
+    List<String> parseErrorFieldNameList = data.getParseErrorFieldNames();
+    if (parseErrorFieldNameList != null && !parseErrorFieldNameList.isEmpty()) {
+      throw new ApplicationParseException(parseErrorFieldNameList);
+    }
     return value;
   }
 
