@@ -4,7 +4,6 @@ import com.sarality.task.Task;
 import com.sarality.task.TaskProgressPublisher;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Import Data provided by the tab or comma separated file.
@@ -40,7 +39,7 @@ public class DelimitedFileImporter implements Task<Void, ImportStatus, ImportSta
   }
 
   @Override
-  public ImportStatus execute(List<Void> inputList, TaskProgressPublisher<ImportStatus> progressPublisher) {
+  public ImportStatus execute(Void input, TaskProgressPublisher<ImportStatus> progressPublisher) {
     int numLines = 0;
     try {
       numLines = countLines();
