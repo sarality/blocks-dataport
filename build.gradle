@@ -23,6 +23,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(path: ':blocks:datasource')
     compile project(path: ':blocks:db')
     compile project(path: ':blocks:form')
     compile project(path: ':blocks:task')
