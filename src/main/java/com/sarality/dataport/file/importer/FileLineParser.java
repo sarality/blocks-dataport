@@ -1,6 +1,8 @@
-package com.sarality.dataport.file;
+package com.sarality.dataport.file.importer;
 
 import com.sarality.error.ApplicationParseException;
+
+import java.util.List;
 
 /**
  * Parses a line in a file to a data object.
@@ -9,9 +11,7 @@ import com.sarality.error.ApplicationParseException;
  */
 public interface FileLineParser<T> {
 
-  void initColumns(String line, String[] values);
+  void initColumns(List<String> columnNameList);
 
-  T parse(String line, String[] values) throws ApplicationParseException;
-
-  T getData();
+  T parse(List<String> valueList) throws ApplicationParseException;
 }

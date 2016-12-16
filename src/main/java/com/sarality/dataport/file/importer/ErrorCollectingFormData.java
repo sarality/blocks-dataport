@@ -1,4 +1,4 @@
-package com.sarality.dataport.file;
+package com.sarality.dataport.file.importer;
 
 import com.sarality.form.FormData;
 import com.sarality.form.FormField;
