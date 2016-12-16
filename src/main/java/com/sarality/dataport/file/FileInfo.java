@@ -21,6 +21,11 @@ public class FileInfo {
     this.directoryPath = directoryPath;
   }
 
+  public FileInfo(String filePath) {
+    this.fileName = new File(filePath).getName();
+    this.directoryPath = new File(filePath).getParent();
+  }
+
   public static FileInfo downloadsFile(String fileName, boolean appendTimestamp) {
     File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     return new FileInfo(generateFileName(fileName, appendTimestamp), directory.getPath());
