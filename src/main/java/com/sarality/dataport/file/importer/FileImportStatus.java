@@ -17,12 +17,13 @@ public class FileImportStatus {
 
   private int totalItemCount;
   private int processedCount;
+  private int skippedCount;
   private int successCount;
   private int errorCount;
 
-  public FileImportStatus(String fileName, String filePath, String errorFileName, String errorFilePath,
-      boolean importSuccessful, String failureReason, int totalItemCount, int processedCount, int successCount,
-      int errorCount) {
+  FileImportStatus(String fileName, String filePath, String errorFileName, String errorFilePath,
+      boolean importSuccessful, String failureReason, int totalItemCount, int processedCount, int skippedCount,
+      int successCount, int errorCount) {
     this.fileName = fileName;
     this.filePath = filePath;
     this.errorFileName = errorFileName;
@@ -31,8 +32,25 @@ public class FileImportStatus {
     this.failureReason = failureReason;
     this.totalItemCount = totalItemCount;
     this.processedCount = processedCount;
+    this.skippedCount = skippedCount;
     this.successCount = successCount;
     this.errorCount = errorCount;
+  }
+
+  public String getErrorFileName() {
+    return errorFileName;
+  }
+
+  public String getErrorFilePath() {
+    return errorFilePath;
+  }
+
+  public boolean isImportSuccessful() {
+    return importSuccessful;
+  }
+
+  public String getFailureReason() {
+    return failureReason;
   }
 
   public int getTotalItemCount() {
@@ -41,6 +59,10 @@ public class FileImportStatus {
 
   public int getProcessedCount() {
     return processedCount;
+  }
+
+  public int getSkippedCount() {
+    return skippedCount;
   }
 
   public int getSuccessCount() {

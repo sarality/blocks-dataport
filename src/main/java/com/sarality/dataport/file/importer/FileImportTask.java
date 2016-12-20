@@ -60,7 +60,7 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
       logger.error("Error counting lines in input file " + inputFile.getDirectoryPath() + "/"
           + inputFile.getFileName(), e);
       return new FileImportStatus(inputFile.getFileName(), inputFile.getDirectoryPath(),
-          errorFileInfo.getFileName(), errorFileInfo.getDirectoryPath(), false, e.getMessage(), numLines, 0, 0, 0);
+          errorFileInfo.getFileName(), errorFileInfo.getDirectoryPath(), false, e.getMessage(), numLines, 0, 0, 0, 0);
     } finally {
       try {
         reader.close();
@@ -92,13 +92,14 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
         // DO nothing - as original status will be returned anyway.
       }
       return new FileImportStatus(inputFile.getFileName(), inputFile.getDirectoryPath(),
-          errorFileInfo.getFileName(), errorFileInfo.getDirectoryPath(), false, e.getMessage(), numLines, 0, 0, 0);
+          errorFileInfo.getFileName(), errorFileInfo.getDirectoryPath(), false, e.getMessage(), numLines, 0, 0, 0, 0);
     }
 
     boolean hasMoreLines = true;
     int ctr = 0;
     int numErrors = 0;
     int numSuccesses = 0;
+    int numSkipped = 0;
     while (hasMoreLines) {
       String line;
       try {
@@ -120,22 +121,30 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
       } else {
         try {
           T data = lineParser.parse(rowData);
-          dataProcessor.processData(data);
-          numSuccesses++;
+          if (data != null) {
+            dataProcessor.processData(data);
+            numSuccesses++;
+          } else {
+            numSkipped++;
+          }
         } catch (ApplicationParseException ape) {
           numErrors++;
           errorWriter.processParseErrors(line, ape);
-          progressPublisher.updateProgress(new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors));
+          progressPublisher.updateProgress(
+              new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
         } catch (ApplicationException ae) {
           numErrors++;
           errorWriter.processErrors(line, ae);
-          progressPublisher.updateProgress(new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors));
+          progressPublisher.updateProgress(
+              new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
         }
       }
-      progressPublisher.updateProgress(new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors));
+      progressPublisher.updateProgress(
+          new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
       ctr++;
     }
-    progressPublisher.updateProgress(new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors));
+    progressPublisher.updateProgress(
+        new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
 
     try {
       reader.close();
@@ -150,7 +159,7 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
     }
     return new FileImportStatus(inputFile.getFileName(), inputFile.getDirectoryPath(),
         errorFileInfo.getFileName(), errorFileInfo.getDirectoryPath(), true, null,
-        numLines, ctr-1, numSuccesses, numErrors);
+        numLines, ctr-1, numSkipped, numSuccesses, numErrors);
   }
 
   @Override
