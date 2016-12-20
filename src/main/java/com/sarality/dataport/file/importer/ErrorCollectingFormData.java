@@ -50,6 +50,9 @@ class ErrorCollectingFormData extends FormData {
   @Override
   public DateTime getDate(String fieldName) {
     DateTime dateTime = super.getDate(fieldName);
+    if (dateTime == null) {
+      return null;
+    }
     if (DateTime.isParseable(dateTime.getRawDateString())) {
       return dateTime;
     } else {
