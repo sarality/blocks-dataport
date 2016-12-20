@@ -31,12 +31,19 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
   private final FileInfo errorFileInfo;
   private final Delimiter delimiter;
 
-  public FileImportTask(List<FormField> fieldList, FormDataConverter<T> dataConverter,
-      FileLineDataProcessor<T> dataProcessor, FileInfo errorFileInfo, Delimiter delimiter) {
-    this.lineParser = new FormDataFileLineParser<>(fieldList, dataConverter);
+  private FileImportTask(FileLineParser<T> lineParser, FileLineDataProcessor<T> dataProcessor,
+      FileInfo errorFileInfo, Delimiter delimiter) {
+    this.lineParser = lineParser;
     this.dataProcessor = dataProcessor;
     this.errorFileInfo = errorFileInfo;
     this.delimiter = delimiter;
+  }
+
+  public FileImportTask(List<FormField> fieldList, FormDataConverter<T> dataConverter,
+      List<ColumnValueResolver> fieldValueResolverList, FileLineDataProcessor<T> dataProcessor,
+      FileInfo errorFileInfo, Delimiter delimiter) {
+    this(new FormDataFileLineParser<>(fieldList, dataConverter, fieldValueResolverList), dataProcessor,
+        errorFileInfo, delimiter);
   }
 
   private FileImportStatus importFile(FileInfo inputFile, TaskProgressPublisher<FileImportProgress> progressPublisher) {
