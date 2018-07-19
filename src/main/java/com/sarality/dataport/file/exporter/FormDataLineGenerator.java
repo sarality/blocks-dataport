@@ -46,7 +46,7 @@ class FormDataLineGenerator<T> implements FileLineGenerator<T> {
     StringBuilder builder = new StringBuilder();
     int ctr = 0;
     for (FormField field : fieldList) {
-      String value = formData.getString(field);
+      String value = formData.getString(field, true);
       if (ctr > 0) {
         builder.append(delimiter.getStringValue());
       }
