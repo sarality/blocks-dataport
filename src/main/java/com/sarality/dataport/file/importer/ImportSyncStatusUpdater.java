@@ -22,17 +22,23 @@ public class ImportSyncStatusUpdater<T, E extends Enum<E>> {
   private final Column globalIdColumn;
   private final Column globalVersionColumn;
   private final Column locallyModifiedColumn;
+  private final E locallyModifiedValue;
+  private final E notLocallyModifiedValue;
 
   public ImportSyncStatusUpdater(Table<T> table,
       Column idColumn,
       Column globalIdColumn,
       Column globalVersionColumn,
-      Column locallyModifiedColumn) {
+      Column locallyModifiedColumn,
+      E locallyModifiedValue,
+      E notLocallyModifiedValue) {
     this.table = table;
     this.idColumn = idColumn;
     this.globalIdColumn = globalIdColumn;
     this.globalVersionColumn = globalVersionColumn;
     this.locallyModifiedColumn = locallyModifiedColumn;
+    this.locallyModifiedValue = locallyModifiedValue;
+    this.notLocallyModifiedValue = notLocallyModifiedValue;
   }
 
   void updateStatus(Long entityId, SyncStatusData<E> data) {
@@ -51,4 +57,13 @@ public class ImportSyncStatusUpdater<T, E extends Enum<E>> {
       table.close();
     }
   }
+
+  E getLocallyModifiedValue() {
+    return locallyModifiedValue;
+  }
+
+  E getNotLocallyModifiedValue() {
+    return notLocallyModifiedValue;
+  }
+
 }

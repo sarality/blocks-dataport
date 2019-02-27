@@ -10,10 +10,8 @@ import com.sarality.form.FormDataConverter;
  */
 public class SyncStatusDataFormConverter<E extends Enum<E>> implements FormDataConverter<SyncStatusData<E>> {
   private final Class<E> enumClass;
-  private final E defaultValue;
 
-  public SyncStatusDataFormConverter(E defaultValue, Class<E> enumClass) {
-    this.defaultValue = defaultValue;
+  public SyncStatusDataFormConverter(Class<E> enumClass) {
     this.enumClass = enumClass;
   }
 
@@ -23,9 +21,6 @@ public class SyncStatusDataFormConverter<E extends Enum<E>> implements FormDataC
     data.setGlobalId(form.getString(SyncStatusFormField.GLOBAL_ID));
     data.setGlobalVersion(form.getLong(SyncStatusFormField.GLOBAL_VERSION));
     data.setEnumValue(form.getEnum(SyncStatusFormField.LOCALLY_MODIFIED, enumClass));
-    if (data.getEnumValue() == null) {
-      data.setEnumValue(defaultValue);
-    }
     return data;
   }
 
