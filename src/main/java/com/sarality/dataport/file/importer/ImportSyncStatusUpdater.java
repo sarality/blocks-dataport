@@ -34,7 +34,7 @@ public class ImportSyncStatusUpdater<T, E extends Enum<E>> {
     this.locallyModifiedColumn = locallyModifiedColumn;
   }
 
-  public void updateStatus(Long entityId, ImportMetadata<E> data) {
+  void updateStatus(Long entityId, ImportMetadata<E> data) {
 
     ContentValues contentValues = new ContentValues();
     ContentValueWriter writer = new ContentValueWriter(contentValues);
