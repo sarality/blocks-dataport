@@ -18,6 +18,7 @@ public class ImportFileLineDataProcessor<T> implements FileLineDataProcessor<T> 
   private final ImportDataPersister<T> persister;
   private final FileLineParser syncStatusParser;
   private final ImportSyncStatusUpdater<T, ? extends Enum<?>> syncStatusUpdater;
+  private boolean isInitialized;
 
   public <E extends Enum<E>> ImportFileLineDataProcessor(ImportDataPersister<T> persister,
       FileLineParser<SyncStatusData<E>> syncStatusParser,
@@ -34,10 +35,15 @@ public class ImportFileLineDataProcessor<T> implements FileLineDataProcessor<T> 
 
   @Override
   @SuppressWarnings("unchecked")
-  public void processData(List<String> rowData, T data) throws ApplicationParseException, ApplicationException {
+  public void processData(List<String> columnNames, List<String> rowData, T data)
+      throws ApplicationParseException, ApplicationException {
     if (data != null) {
       SyncStatusData syncStatusData = null;
       if (syncStatusParser != null && syncStatusUpdater != null) {
+        if (!isInitialized) {
+          syncStatusParser.initColumns(columnNames);
+          isInitialized = true;
+        }
         syncStatusData = (SyncStatusData) syncStatusParser.parse(rowData);
         syncStatusData = sanitize(syncStatusData);
       }

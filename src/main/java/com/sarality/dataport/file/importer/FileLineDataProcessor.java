@@ -12,5 +12,6 @@ import java.util.List;
  */
 public interface FileLineDataProcessor<T> {
 
-  void processData(List<String> rowData, T data) throws ApplicationParseException, ApplicationException;
+  void processData(List<String> columnNames, List<String> rowData, T data)
+      throws ApplicationParseException, ApplicationException;
 }

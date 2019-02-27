@@ -17,7 +17,7 @@ public class FormDataLogger implements FileLineDataProcessor<FormData> {
   private static final Logger logger = LoggerFactory.getLogger(FormDataLogger.class);
 
   @Override
-  public void processData(List<String> rowData, FormData data) {
+  public void processData(List<String> columnNames, List<String> rowData, FormData data) {
     logger.info("Extracted Form Data {}", data);
   }
 }
