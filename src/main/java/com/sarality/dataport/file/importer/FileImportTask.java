@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -100,6 +101,7 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
     int numErrors = 0;
     int numSuccesses = 0;
     int numSkipped = 0;
+    List<String> columnNames = new ArrayList<>();
     while (hasMoreLines) {
       String line;
       try {
@@ -117,12 +119,13 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
       List<String> rowData = Arrays.asList(values);
       if (ctr == 0) {
         lineParser.initColumns(rowData);
+        columnNames.addAll(rowData);
         errorWriter.setHeaders(line);
       } else {
         try {
           T data = lineParser.parse(rowData);
           if (data != null) {
-            dataProcessor.processData(rowData, data);
+            dataProcessor.processData(columnNames, rowData, data);
             numSuccesses++;
           } else {
             numSkipped++;
