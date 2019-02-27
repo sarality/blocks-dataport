@@ -37,7 +37,7 @@ public class ImportFileLineDataProcessor<T> implements FileLineDataProcessor<T> 
         importMetadata = (ImportMetadata) importMetadataParser.parse(rowData);
       }
       Long id = persister.persistData(data);
-      if (importMetadata != null) {
+      if (id != null && importMetadata != null) {
         syncStatusUpdater.updateStatus(id, importMetadata);
       }
     }
