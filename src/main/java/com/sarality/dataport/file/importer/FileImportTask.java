@@ -122,7 +122,7 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
         try {
           T data = lineParser.parse(rowData);
           if (data != null) {
-            dataProcessor.processData(data);
+            dataProcessor.processData(rowData, data);
             numSuccesses++;
           } else {
             numSkipped++;
