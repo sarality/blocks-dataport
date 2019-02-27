@@ -11,6 +11,7 @@ import com.sarality.task.Task;
 import com.sarality.task.TaskProgressPublisher;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,12 +21,17 @@ import java.util.List;
  */
 public class FileExportTask<T> implements Task<FileInfo, ProgressCount, FileExportStatus> {
   private final DataSource<List<T>> dataSource;
-  private final FormDataLineGenerator<T> lineGenerator;
+  private final FileLineGenerator<T> lineGenerator;
 
   public FileExportTask(DataSource<List<T>> dataSource,
       List<FormField> fieldList, FormDataConverter<T> dataConverter, Delimiter delimiter) {
+    this(dataSource, fieldList, dataConverter, new ArrayList<FormDataTransformer>(), delimiter);
+  }
+
+  public FileExportTask(DataSource<List<T>> dataSource, List<FormField> fieldList,
+      FormDataConverter<T> dataConverter, List<FormDataTransformer> transformers, Delimiter delimiter) {
     this.dataSource = dataSource;
-    this.lineGenerator = new FormDataLineGenerator<>(fieldList, dataConverter, delimiter);
+    this.lineGenerator = new FormDataLineGenerator<>(fieldList, dataConverter, transformers, delimiter);
   }
 
   private FileExportStatus export(FileInfo exportFile, TaskProgressPublisher<ProgressCount> progressPublisher) {
@@ -43,6 +49,8 @@ public class FileExportTask<T> implements Task<FileInfo, ProgressCount, FileExpo
       return new FileExportStatus(exportFile.getFileName(), exportFile.getDirectoryPath(), false, t.getMessage());
     }
 
+    // initialize the transformers
+    lineGenerator.init();
     // Add Headers
     try {
       writer.writeToFile(lineGenerator.generateHeader());
