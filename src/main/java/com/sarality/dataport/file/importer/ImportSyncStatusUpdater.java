@@ -2,6 +2,7 @@ package com.sarality.dataport.file.importer;
 
 import android.content.ContentValues;
 
+import com.sarality.dataport.file.SyncStatusData;
 import com.sarality.db.Column;
 import com.sarality.db.Table;
 import com.sarality.db.content.ContentValueWriter;
@@ -34,7 +35,7 @@ public class ImportSyncStatusUpdater<T, E extends Enum<E>> {
     this.locallyModifiedColumn = locallyModifiedColumn;
   }
 
-  void updateStatus(Long entityId, ImportMetadata<E> data) {
+  void updateStatus(Long entityId, SyncStatusData<E> data) {
 
     ContentValues contentValues = new ContentValues();
     ContentValueWriter writer = new ContentValueWriter(contentValues);

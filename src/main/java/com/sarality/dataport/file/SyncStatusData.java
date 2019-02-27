@@ -1,14 +1,23 @@
-package com.sarality.dataport.file.importer;
+package com.sarality.dataport.file;
 
 /**
- * Data object that contains Sync information for data that has been imported.
+ * Data object that contains Sync information for data that has been imported or exported.
  *
  * @author abhideep@ (Abhideep Singh)
  */
-public class ImportMetadata<E extends Enum<E>> {
+public class SyncStatusData<E extends Enum<E>> {
+  private Long localId;
   private String globalId;
   private Long globalVersion;
   private E enumValue;
+
+  public Long getLocalId() {
+    return localId;
+  }
+
+  public void setLocalId(Long localId) {
+    this.localId = localId;
+  }
 
   public String getGlobalId() {
     return globalId;

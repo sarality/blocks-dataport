@@ -1,5 +1,6 @@
 package com.sarality.dataport.file.importer;
 
+import com.sarality.dataport.file.SyncStatusData;
 import com.sarality.error.ApplicationException;
 import com.sarality.error.ApplicationParseException;
 
@@ -12,14 +13,14 @@ import java.util.List;
  */
 public class ImportFileLineDataProcessor<T> implements FileLineDataProcessor<T> {
   private final ImportDataPersister<T> persister;
-  private final FileLineParser importMetadataParser;
+  private final FileLineParser syncStatusParser;
   private final ImportSyncStatusUpdater<T, ? extends Enum<?>> syncStatusUpdater;
 
   public <E extends Enum<E>> ImportFileLineDataProcessor(ImportDataPersister<T> persister,
-      FileLineParser<ImportMetadata<E>> importMetadataParser,
+      FileLineParser<SyncStatusData<E>> syncStatusParser,
       ImportSyncStatusUpdater<T, E> syncStatusUpdater) {
     this.persister = persister;
-    this.importMetadataParser = importMetadataParser;
+    this.syncStatusParser = syncStatusParser;
     this.syncStatusUpdater = syncStatusUpdater;
   }
 
@@ -32,13 +33,13 @@ public class ImportFileLineDataProcessor<T> implements FileLineDataProcessor<T> 
   @SuppressWarnings("unchecked")
   public void processData(List<String> rowData, T data) throws ApplicationParseException, ApplicationException {
     if (data != null) {
-      ImportMetadata importMetadata = null;
-      if (importMetadataParser != null) {
-        importMetadata = (ImportMetadata) importMetadataParser.parse(rowData);
+      SyncStatusData syncStatusData = null;
+      if (syncStatusParser != null) {
+        syncStatusData = (SyncStatusData) syncStatusParser.parse(rowData);
       }
       Long id = persister.persistData(data);
-      if (id != null && importMetadata != null) {
-        syncStatusUpdater.updateStatus(id, importMetadata);
+      if (id != null && syncStatusData != null) {
+        syncStatusUpdater.updateStatus(id, syncStatusData);
       }
     }
   }
