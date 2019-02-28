@@ -54,7 +54,7 @@ public abstract class BaseFileExporter<T> implements FileExporter<T> {
     }
 
     int numItems = dataList.size();
-    updateProgress(progressPublisher, new FileExportProgress(numItems, 0));
+    updateProgress(progressPublisher, new FileExportProgress(0, numItems));
     int ctr = 0;
     int numSuccesses = 0;
     int numFailures = 0;
@@ -68,7 +68,7 @@ public abstract class BaseFileExporter<T> implements FileExporter<T> {
         numFailures++;
       }
       ctr++;
-      updateProgress(progressPublisher, new FileExportProgress(numItems, ctr));
+      updateProgress(progressPublisher, new FileExportProgress(ctr, numItems));
     }
     try {
       writer.close();
