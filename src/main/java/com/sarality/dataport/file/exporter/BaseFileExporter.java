@@ -1,12 +1,8 @@
 package com.sarality.dataport.file.exporter;
 
-import com.sarality.dataport.file.Delimiter;
 import com.sarality.dataport.file.FileInfo;
 import com.sarality.dataport.file.OutputFileWriter;
 import com.sarality.datasource.DataSource;
-import com.sarality.db.Table;
-import com.sarality.form.FormDataConverter;
-import com.sarality.form.FormField;
 import com.sarality.task.TaskProgressPublisher;
 
 import java.io.IOException;
@@ -20,26 +16,16 @@ import hirondelle.date4j.DateTime;
  *
  * @author satya (satya puniani)
  */
-public class BaseFileExporter<T> {
+public abstract class BaseFileExporter<T> {
 
   private final String BASE_FILE_NAME = "EXPORT.tsv";
-
-  private final Table<T> table;
-  private final DataSource<List<T>> dataSource;
-  private final FileLineGenerator<T> lineGenerator;
-
-  public BaseFileExporter(Table<T> table, DataSource<List<T>> dataSource, List<FormField> fieldList,
-      FormDataConverter<T> dataConverter, List<FormDataTransformer> transformers, Delimiter delimiter) {
-    this.table = table;
-    this.dataSource = dataSource;
-    this.lineGenerator = new FormDataLineGenerator<>(fieldList, dataConverter, transformers, delimiter);
-  }
 
   public String getFileName(DateTime exportDate) {
     return getFileName(BASE_FILE_NAME, exportDate);
   }
 
-  public FileExportStatus export(FileInfo exportFile, TaskProgressPublisher<FileExportProgress> progressPublisher) {
+  public final FileExportStatus export(FileInfo exportFile, TaskProgressPublisher<FileExportProgress>
+      progressPublisher) {
     OutputFileWriter writer = new OutputFileWriter(exportFile);
     try {
       writer.open();
@@ -48,6 +34,7 @@ public class BaseFileExporter<T> {
     }
     List<T> dataList;
     try {
+      DataSource<List<T>> dataSource = getDataSource();
       dataSource.load();
       dataList = dataSource.getData();
     } catch (Throwable t) {
@@ -55,6 +42,7 @@ public class BaseFileExporter<T> {
     }
 
     // initialize the transformers
+    FileLineGenerator<T> lineGenerator = getFileLineGenerator();
     lineGenerator.init();
     // Add Headers
     try {
@@ -90,6 +78,12 @@ public class BaseFileExporter<T> {
         numItems, numSuccesses, numFailures);
   }
 
+  protected abstract FileLineGenerator<T> getFileLineGenerator();
+
+  protected abstract DataSource<List<T>> getDataSource();
+
+  protected abstract String getName();
+
   private void updateProgress(TaskProgressPublisher<FileExportProgress> progressPublisher,
       FileExportProgress progress) {
     if (progressPublisher != null) {
@@ -107,7 +101,7 @@ public class BaseFileExporter<T> {
     }
     return fileName
         .concat("_")
-        .concat(table.getName())
+        .concat(getName())
         .concat(exportDate.format("_MMM_DD", Locale.getDefault()))
         .concat(extension);
   }
