@@ -34,7 +34,6 @@ class FormDataLineGenerator<T> implements FileLineGenerator<T> {
   public void init() {
     for (FormDataTransformer transformer : transformerList) {
       transformer.init();
-      // TODO (@satya): add the form fields to the fields list
     }
   }
 
