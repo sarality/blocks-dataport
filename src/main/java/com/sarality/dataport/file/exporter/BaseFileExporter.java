@@ -16,14 +16,16 @@ import hirondelle.date4j.DateTime;
  *
  * @author satya (satya puniani)
  */
-public abstract class BaseFileExporter<T> {
+public abstract class BaseFileExporter<T> implements FileExporter<T> {
 
   private final String BASE_FILE_NAME = "EXPORT.tsv";
 
+  @Override
   public String getFileName(DateTime exportDate) {
     return getFileName(BASE_FILE_NAME, exportDate);
   }
 
+  @Override
   public final FileExportStatus export(FileInfo exportFile, TaskProgressPublisher<FileExportProgress>
       progressPublisher) {
     OutputFileWriter writer = new OutputFileWriter(exportFile);
