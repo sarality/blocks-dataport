@@ -3,6 +3,7 @@ package com.sarality.dataport.file.importer;
 import android.text.TextUtils;
 
 import com.sarality.dataport.file.SyncStatusData;
+import com.sarality.dataport.file.SyncStatusFormField;
 import com.sarality.error.ApplicationException;
 import com.sarality.error.ApplicationParseException;
 
@@ -61,22 +62,20 @@ public class ImportFileLineDataProcessor<T> implements FileLineDataProcessor<T> 
     String globalId = data.getGlobalId();
     Long globalVersion = data.getGlobalVersion();
     Enum enumValue = data.getEnumValue();
-    // If no Global Ids are specified and Locally Modified is True or empty, do nothing.
-    if (TextUtils.isEmpty(globalId) && globalVersion == null
-        && (enumValue == null || enumValue == syncStatusUpdater.getLocallyModifiedValue())) {
+    // If none of Global Id, Global version, and Locally modified are specified
+    // Then this is a new local entry that has not been synced yet
+    if (TextUtils.isEmpty(globalId) && globalVersion == null && enumValue == null) {
       return null;
     }
 
-    // If Global Id and Version are there but no value for LocallyModified, assume it is not modified.
-    if (!TextUtils.isEmpty(globalId) && globalVersion != null && enumValue == null) {
-      data.setEnumValue(syncStatusUpdater.getNotLocallyModifiedValue());
-    }
-
+    // Otherwise all there of GlobalId, Global version, and Locally modified must be set
     if (!TextUtils.isEmpty(globalId) && globalVersion != null && data.getEnumValue() != null) {
       return data;
     }
 
-    throw new ApplicationParseException("SYNC_DATA_MISMATCH",
-        Arrays.asList("GLOBAL_ID", "GLOBAL_VERSION", "LOCALLY_MODIFIED"));
+    throw new ApplicationParseException(Arrays.asList(
+        SyncStatusFormField.GLOBAL_ID.name(),
+        SyncStatusFormField.GLOBAL_VERSION.name(),
+        SyncStatusFormField.LOCALLY_MODIFIED.name()));
   }
 }
