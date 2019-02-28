@@ -9,8 +9,16 @@ import com.sarality.form.FormData;
  */
 public interface FormDataTransformer {
 
+  /**
+   * initializes the transformer
+   */
   void init();
 
+  /**
+   * performs the transformation on the form data
+   *
+   * @param formData: form data representation of the data to be exported
+   */
   void transform(FormData formData);
 
 }
