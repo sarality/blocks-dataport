@@ -40,8 +40,8 @@ public class OutputFileWriter {
 
   public void writeToFile(String line) throws IOException {
     logger.debug("Writing line to file {} ", line);
-    bufferedWriter.newLine();
     bufferedWriter.write(line);
+    bufferedWriter.newLine();
     bufferedWriter.flush();
   }
 }
