@@ -6,6 +6,7 @@ import com.sarality.dataport.file.SyncStatusData;
 import com.sarality.db.Column;
 import com.sarality.db.Table;
 import com.sarality.db.content.ContentValueWriter;
+import com.sarality.db.modifier.LocallyModifiedColumnUpdater;
 import com.sarality.db.query.Query;
 import com.sarality.db.query.SimpleQueryBuilder;
 
@@ -46,7 +47,8 @@ public class ImportSyncStatusUpdater<T, E extends Enum<E>> {
     Query query = new SimpleQueryBuilder().withFilter(idColumn, entityId).build();
     try {
       table.open();
-      table.update(contentValues, query);
+      table.update(contentValues, query,
+          new LocallyModifiedColumnUpdater<E>(locallyModifiedColumn, data.getEnumValue()));
     } finally {
       table.close();
     }
