@@ -37,15 +37,15 @@ public class FileInfo {
     }
     DateTime now = DateTime.now(TimeZone.getDefault());
     String extension = "";
-    String errorFileName = fileName;
+    String generateFileName = fileName;
 
     int extensionIndex = fileName.lastIndexOf('.');
     if (extensionIndex > 0) {
       extension = fileName.substring(extensionIndex);
-      errorFileName = fileName.substring(0, extensionIndex - 1);
+      generateFileName = fileName.substring(0, extensionIndex);
     }
 
-    return errorFileName + now.format("_YYYYMMDD_hhmmss") + extension;
+    return generateFileName + now.format("_YYYYMMDD_hhmmss") + extension;
   }
 
   public String getFileName() {

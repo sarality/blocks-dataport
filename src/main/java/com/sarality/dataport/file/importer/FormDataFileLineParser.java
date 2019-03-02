@@ -23,7 +23,7 @@ import java.util.Set;
  *
  * @author abhideep@ (Abhideep Singh)
  */
-class FormDataFileLineParser<T> implements FileLineParser<T> {
+public class FormDataFileLineParser<T> implements FileLineParser<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(FormDataFileLineParser.class);
 
@@ -36,7 +36,7 @@ class FormDataFileLineParser<T> implements FileLineParser<T> {
   private final List<ColumnValueResolver> columnValueResolverList = new ArrayList<>();
   private final Set<String> resolvedColumnSet = new HashSet<>();
 
-  FormDataFileLineParser(List<FormField> fieldList, FormDataConverter<T> dataConverter,
+  public FormDataFileLineParser(List<FormField> fieldList, FormDataConverter<T> dataConverter,
       List<ColumnValueResolver> columnValueResolverList) {
     this.fieldList = fieldList;
     this.dataConverter = dataConverter;

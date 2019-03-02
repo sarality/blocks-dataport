@@ -8,6 +8,11 @@ package com.sarality.dataport.file.exporter;
 public interface FileLineGenerator<T> {
 
   /**
+   * initialise the line generator
+   */
+  void init();
+
+  /**
    * @return Header Line for the File
    */
   String generateHeader();

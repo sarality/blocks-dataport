@@ -1,40 +1,33 @@
 package com.sarality.dataport.file.exporter;
 
-import com.sarality.dataport.file.Delimiter;
 import com.sarality.dataport.file.FileInfo;
 import com.sarality.dataport.file.OutputFileWriter;
 import com.sarality.datasource.DataSource;
-import com.sarality.form.FormDataConverter;
-import com.sarality.form.FormField;
-import com.sarality.task.ProgressCount;
-import com.sarality.task.Task;
 import com.sarality.task.TaskProgressPublisher;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+
+import hirondelle.date4j.DateTime;
 
 /**
- * A Task that exports data to a Delimited File.
+ * File exporter class that loads, transforms and exports data to a specified file
  *
- * @author abhideep@ (Abhideep Singh)
+ * @author satya (satya puniani)
  */
-public class FileExportTask<T> implements Task<FileInfo, ProgressCount, FileExportStatus> {
-  private final DataSource<List<T>> dataSource;
-  private final FileLineGenerator<T> lineGenerator;
+public abstract class BaseFileExporter<T> implements FileExporter<T> {
 
-  public FileExportTask(DataSource<List<T>> dataSource,
-      List<FormField> fieldList, FormDataConverter<T> dataConverter, Delimiter delimiter) {
-    this(dataSource, fieldList, dataConverter, new ArrayList<FormDataTransformer>(), delimiter);
+  private final String BASE_FILE_NAME = "EXPORT.tsv";
+
+  @Override
+  public String getFileName(DateTime exportDate) {
+    return getFileName(BASE_FILE_NAME, exportDate);
   }
 
-  public FileExportTask(DataSource<List<T>> dataSource, List<FormField> fieldList,
-      FormDataConverter<T> dataConverter, List<FormDataTransformer> transformers, Delimiter delimiter) {
-    this.dataSource = dataSource;
-    this.lineGenerator = new FormDataLineGenerator<>(fieldList, dataConverter, transformers, delimiter);
-  }
-
-  private FileExportStatus export(FileInfo exportFile, TaskProgressPublisher<ProgressCount> progressPublisher) {
+  @Override
+  public final FileExportStatus export(FileInfo exportFile, TaskProgressPublisher<FileExportProgress>
+      progressPublisher) {
     OutputFileWriter writer = new OutputFileWriter(exportFile);
     try {
       writer.open();
@@ -43,6 +36,7 @@ public class FileExportTask<T> implements Task<FileInfo, ProgressCount, FileExpo
     }
     List<T> dataList;
     try {
+      DataSource<List<T>> dataSource = getDataSource();
       dataSource.load();
       dataList = dataSource.getData();
     } catch (Throwable t) {
@@ -50,6 +44,7 @@ public class FileExportTask<T> implements Task<FileInfo, ProgressCount, FileExpo
     }
 
     // initialize the transformers
+    FileLineGenerator<T> lineGenerator = getFileLineGenerator();
     lineGenerator.init();
     // Add Headers
     try {
@@ -59,7 +54,7 @@ public class FileExportTask<T> implements Task<FileInfo, ProgressCount, FileExpo
     }
 
     int numItems = dataList.size();
-    updateProgress(progressPublisher, new ProgressCount(numItems, 0));
+    updateProgress(progressPublisher, new FileExportProgress(0, numItems));
     int ctr = 0;
     int numSuccesses = 0;
     int numFailures = 0;
@@ -73,7 +68,7 @@ public class FileExportTask<T> implements Task<FileInfo, ProgressCount, FileExpo
         numFailures++;
       }
       ctr++;
-      updateProgress(progressPublisher, new ProgressCount(numItems, ctr));
+      updateProgress(progressPublisher, new FileExportProgress(ctr, numItems));
     }
     try {
       writer.close();
@@ -85,14 +80,32 @@ public class FileExportTask<T> implements Task<FileInfo, ProgressCount, FileExpo
         numItems, numSuccesses, numFailures);
   }
 
-  private void updateProgress(TaskProgressPublisher<ProgressCount> progressPublisher, ProgressCount progress) {
+  protected abstract FileLineGenerator<T> getFileLineGenerator();
+
+  protected abstract DataSource<List<T>> getDataSource();
+
+  protected abstract String getName();
+
+  private void updateProgress(TaskProgressPublisher<FileExportProgress> progressPublisher,
+      FileExportProgress progress) {
     if (progressPublisher != null) {
       progressPublisher.updateProgress(progress);
     }
   }
 
-  @Override
-  public FileExportStatus execute(FileInfo exportFile, TaskProgressPublisher<ProgressCount> progressPublisher) {
-    return export(exportFile, progressPublisher);
+  private String getFileName(String fileName, DateTime exportDate) {
+    String extension = "";
+
+    int extensionIndex = fileName.lastIndexOf('.');
+    if (extensionIndex > 0) {
+      extension = fileName.substring(extensionIndex);
+      fileName = fileName.substring(0, extensionIndex);
+    }
+    return fileName
+        .concat("_")
+        .concat(getName())
+        .concat(exportDate.format("_MMM_DD", Locale.getDefault()))
+        .concat(extension);
   }
+
 }
