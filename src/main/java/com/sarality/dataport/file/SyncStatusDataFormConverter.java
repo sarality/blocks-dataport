@@ -70,12 +70,14 @@ public class SyncStatusDataFormConverter<E extends Enum<E>> implements FormDataC
   private E getEnum(String value, SyncStatusData<E> data) {
     String globalId = data.getGlobalId();
     Long globalVersion = data.getGlobalVersion();
-    if (value == null) {
+    if (TextUtils.isEmpty(value)) {
+      // Global Id and Version do exist, then it's not modified
       if (!TextUtils.isEmpty(globalId) && globalVersion != null) {
         return notModifiedEnumValue;
       }
       return null;
     } else if (value.equals(LOCALLY_MODIFIED_TEXT)) {
+      // If is locally Modified, but not Global Id or Version, then not Sync Data is required
       if (TextUtils.isEmpty(globalId) && globalVersion == null) {
         return null;
       }
