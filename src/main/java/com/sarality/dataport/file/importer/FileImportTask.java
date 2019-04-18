@@ -26,6 +26,7 @@ import java.util.List;
  */
 public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, FileImportStatus> {
   private static final Logger logger = LoggerFactory.getLogger(FileImportTask.class);
+  private static final String FILE_IMPORT_TASK = "FILE_IMPORT";
 
   private final FileLineParser<T> lineParser;
   private final FileLineDataProcessor<T> dataProcessor;
@@ -134,20 +135,24 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
           numErrors++;
           errorWriter.processParseErrors(line, ape);
           progressPublisher.updateProgress(
-              new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
+              new FileImportProgress(FILE_IMPORT_TASK, numLines, ctr-1,
+                  numSuccesses, numErrors, numSkipped));
         } catch (ApplicationException ae) {
           numErrors++;
           errorWriter.processErrors(line, ae);
           progressPublisher.updateProgress(
-              new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
+              new FileImportProgress(FILE_IMPORT_TASK, numLines, ctr-1,
+                  numSuccesses, numErrors, numSkipped));
         }
       }
       progressPublisher.updateProgress(
-          new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
+          new FileImportProgress(FILE_IMPORT_TASK, numLines, ctr-1,
+              numSuccesses, numErrors, numSkipped));
       ctr++;
     }
     progressPublisher.updateProgress(
-        new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
+        new FileImportProgress(FILE_IMPORT_TASK, numLines, ctr-1,
+            numSuccesses, numErrors, numSkipped));
 
     try {
       reader.close();

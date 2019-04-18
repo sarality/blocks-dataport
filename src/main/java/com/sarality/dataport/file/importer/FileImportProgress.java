@@ -27,11 +27,6 @@ public class FileImportProgress implements Parcelable {
     this.skippedCount = skippedCount;
   }
 
-  FileImportProgress(int totalItemCount, int processedCount, int successCount, int errorCount,
-      int skippedCount) {
-    this("", totalItemCount, processedCount, successCount, errorCount, skippedCount);
-  }
-
   public String getTaskName() {
     return taskName;
   }
