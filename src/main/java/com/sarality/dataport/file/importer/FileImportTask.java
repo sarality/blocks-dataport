@@ -26,25 +26,40 @@ import java.util.List;
  */
 public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, FileImportStatus> {
   private static final Logger logger = LoggerFactory.getLogger(FileImportTask.class);
-  private static final String FILE_IMPORT_TASK = "FILE_IMPORT";
+  private static final String FILE_IMPORT_TASK_NAME = "FILE_IMPORT";
 
+  private final String importTaskName;
   private final FileLineParser<T> lineParser;
   private final FileLineDataProcessor<T> dataProcessor;
   private final FileInfo errorFileInfo;
   private final Delimiter delimiter;
 
-  private FileImportTask(FileLineParser<T> lineParser, FileLineDataProcessor<T> dataProcessor,
+  private FileImportTask(String importTaskName, FileLineParser<T> lineParser, FileLineDataProcessor<T> dataProcessor,
       FileInfo errorFileInfo, Delimiter delimiter) {
+    this.importTaskName = importTaskName;
     this.lineParser = lineParser;
     this.dataProcessor = dataProcessor;
     this.errorFileInfo = errorFileInfo;
     this.delimiter = delimiter;
   }
 
+  public FileImportTask(String importTaskName, List<FormField> fieldList, FormDataConverter<T> dataConverter,
+      List<ColumnValueResolver> fieldValueResolverList, FileLineDataProcessor<T> dataProcessor,
+      FileInfo errorFileInfo, Delimiter delimiter) {
+    this(importTaskName,
+        new FormDataFileLineParser<>(fieldList, dataConverter, fieldValueResolverList),
+        dataProcessor,
+        errorFileInfo, delimiter);
+  }
+
   public FileImportTask(List<FormField> fieldList, FormDataConverter<T> dataConverter,
       List<ColumnValueResolver> fieldValueResolverList, FileLineDataProcessor<T> dataProcessor,
       FileInfo errorFileInfo, Delimiter delimiter) {
-    this(new FormDataFileLineParser<>(fieldList, dataConverter, fieldValueResolverList), dataProcessor,
+    this(FILE_IMPORT_TASK_NAME,
+        fieldList,
+        dataConverter,
+        fieldValueResolverList,
+        dataProcessor,
         errorFileInfo, delimiter);
   }
 
@@ -135,23 +150,23 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
           numErrors++;
           errorWriter.processParseErrors(line, ape);
           progressPublisher.updateProgress(
-              new FileImportProgress(FILE_IMPORT_TASK, numLines, ctr-1,
+              new FileImportProgress(importTaskName, numLines, ctr-1,
                   numSuccesses, numErrors, numSkipped));
         } catch (ApplicationException ae) {
           numErrors++;
           errorWriter.processErrors(line, ae);
           progressPublisher.updateProgress(
-              new FileImportProgress(FILE_IMPORT_TASK, numLines, ctr-1,
+              new FileImportProgress(importTaskName, numLines, ctr-1,
                   numSuccesses, numErrors, numSkipped));
         }
       }
       progressPublisher.updateProgress(
-          new FileImportProgress(FILE_IMPORT_TASK, numLines, ctr-1,
+          new FileImportProgress(importTaskName, numLines, ctr-1,
               numSuccesses, numErrors, numSkipped));
       ctr++;
     }
     progressPublisher.updateProgress(
-        new FileImportProgress(FILE_IMPORT_TASK, numLines, ctr-1,
+        new FileImportProgress(importTaskName, numLines, ctr-1,
             numSuccesses, numErrors, numSkipped));
 
     try {
