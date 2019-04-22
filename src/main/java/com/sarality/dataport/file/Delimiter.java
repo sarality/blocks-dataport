@@ -6,16 +6,16 @@ package com.sarality.dataport.file;
  * @author abhideep@ (Abhideep Singh)
  */
 public enum Delimiter {
-  TAB("\\t", "\t"),
-  COMMA(",", ","),
+  TAB("\t", "\\t"),
+  COMMA(",", ",(?=([^\"]*\"[^\"]*\")*[^\"]*$)"),
   ;
 
-  private String regularExpression;
   private String stringValue;
+  private String regularExpression;
 
-  Delimiter(String regularExpression, String stringValue) {
-    this.regularExpression = regularExpression;
+  Delimiter(String stringValue, String regularExpression) {
     this.stringValue = stringValue;
+    this.regularExpression = regularExpression;
   }
 
   public String getRegularExpression() {
