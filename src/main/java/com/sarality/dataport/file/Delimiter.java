@@ -6,7 +6,9 @@ package com.sarality.dataport.file;
  * @author abhideep@ (Abhideep Singh)
  */
 public enum Delimiter {
-  TAB("\\t", "\t");
+  TAB("\\t", "\t"),
+  COMMA(",", ","),
+  ;
 
   private String regularExpression;
   private String stringValue;
