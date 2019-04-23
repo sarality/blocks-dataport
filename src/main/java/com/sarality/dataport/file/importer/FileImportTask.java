@@ -7,6 +7,7 @@ import com.sarality.dataport.file.OutputFileWriter;
 import com.sarality.error.ApplicationException;
 import com.sarality.error.ApplicationParseException;
 import com.sarality.form.FormDataConverter;
+import com.sarality.form.FormDataTransformer;
 import com.sarality.form.FormField;
 import com.sarality.task.Task;
 import com.sarality.task.TaskProgressPublisher;
@@ -34,31 +35,35 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
   private final FileInfo errorFileInfo;
   private final Delimiter delimiter;
 
-  private FileImportTask(String importTaskName, FileLineParser<T> lineParser, FileLineDataProcessor<T> dataProcessor,
-      FileInfo errorFileInfo, Delimiter delimiter) {
+  public FileImportTask(
+      String importTaskName,
+      List<FormField> fieldList,
+      FormDataTransformer formDataTransformer,
+      List<ColumnValueResolver> fieldValueResolverList,
+      FormDataConverter<T> dataConverter,
+      FileLineDataProcessor<T> dataProcessor,
+      FileInfo errorFileInfo,
+      Delimiter delimiter) {
     this.importTaskName = importTaskName;
-    this.lineParser = lineParser;
+    this.lineParser = new FormDataFileLineParser<>(fieldList, formDataTransformer, fieldValueResolverList,
+        dataConverter);
     this.dataProcessor = dataProcessor;
     this.errorFileInfo = errorFileInfo;
     this.delimiter = delimiter;
   }
 
-  public FileImportTask(String importTaskName, List<FormField> fieldList, FormDataConverter<T> dataConverter,
-      List<ColumnValueResolver> fieldValueResolverList, FileLineDataProcessor<T> dataProcessor,
-      FileInfo errorFileInfo, Delimiter delimiter) {
-    this(importTaskName,
-        new FormDataFileLineParser<>(fieldList, dataConverter, fieldValueResolverList),
-        dataProcessor,
-        errorFileInfo, delimiter);
-  }
-
-  public FileImportTask(List<FormField> fieldList, FormDataConverter<T> dataConverter,
-      List<ColumnValueResolver> fieldValueResolverList, FileLineDataProcessor<T> dataProcessor,
-      FileInfo errorFileInfo, Delimiter delimiter) {
+  public FileImportTask(
+      List<FormField> fieldList,
+      FormDataConverter<T> dataConverter,
+      List<ColumnValueResolver> fieldValueResolverList,
+      FileLineDataProcessor<T> dataProcessor,
+      FileInfo errorFileInfo,
+      Delimiter delimiter) {
     this(FILE_IMPORT_TASK_NAME,
         fieldList,
-        dataConverter,
+        null,
         fieldValueResolverList,
+        dataConverter,
         dataProcessor,
         errorFileInfo, delimiter);
   }

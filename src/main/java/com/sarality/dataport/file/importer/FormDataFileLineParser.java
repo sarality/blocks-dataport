@@ -6,6 +6,7 @@ import com.sarality.error.ApplicationException;
 import com.sarality.error.ApplicationParseException;
 import com.sarality.error.ErrorCode;
 import com.sarality.form.FormDataConverter;
+import com.sarality.form.FormDataTransformer;
 import com.sarality.form.FormField;
 
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
   private static final Logger logger = LoggerFactory.getLogger(FormDataFileLineParser.class);
 
   private final List<FormField> fieldList;
+  private final FormDataTransformer transformer;
   private final FormDataConverter<T> dataConverter;
 
   private final List<String> columnNameList = new ArrayList<>();
@@ -36,9 +38,20 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
   private final List<ColumnValueResolver> columnValueResolverList = new ArrayList<>();
   private final Set<String> resolvedColumnSet = new HashSet<>();
 
-  public FormDataFileLineParser(List<FormField> fieldList, FormDataConverter<T> dataConverter,
+  public FormDataFileLineParser(
+      List<FormField> fieldList,
+      FormDataConverter<T> dataConverter,
       List<ColumnValueResolver> columnValueResolverList) {
+    this(fieldList, null, columnValueResolverList, dataConverter);
+  }
+
+  public FormDataFileLineParser(
+      List<FormField> fieldList,
+      FormDataTransformer transformer,
+      List<ColumnValueResolver> columnValueResolverList,
+      FormDataConverter<T> dataConverter) {
     this.fieldList = fieldList;
+    this.transformer = transformer;
     this.dataConverter = dataConverter;
     for (FormField field : fieldList) {
       fieldNameMap.put(field.getName(), field);
@@ -86,6 +99,18 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
     if (isEmptyRow) {
       return null;
     }
+
+    // Tranform the form data before the Column values can be resolved
+    if (transformer != null) {
+      transformer.transform(formData);
+
+      // If it is empty after the transformation, then also return null
+      // TODO(abhideep): See how this impacts Sync Data converter
+      if (formData.isEmpty()) {
+        return null;
+      }
+    }
+
 
     // Resolve data that has been skipped so far, now that we have all the data from all columns
     List<String> resolutionErrorList = new ArrayList<>();
