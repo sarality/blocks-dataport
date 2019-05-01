@@ -7,6 +7,7 @@ import com.sarality.dataport.file.OutputFileWriter;
 import com.sarality.error.ApplicationException;
 import com.sarality.error.ApplicationParseException;
 import com.sarality.form.FormDataConverter;
+import com.sarality.form.FormDataTransformer;
 import com.sarality.form.FormField;
 import com.sarality.task.Task;
 import com.sarality.task.TaskProgressPublisher;
@@ -26,24 +27,44 @@ import java.util.List;
  */
 public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, FileImportStatus> {
   private static final Logger logger = LoggerFactory.getLogger(FileImportTask.class);
+  private static final String FILE_IMPORT_TASK_NAME = "FILE_IMPORT";
 
+  private final String importTaskName;
   private final FileLineParser<T> lineParser;
   private final FileLineDataProcessor<T> dataProcessor;
   private final FileInfo errorFileInfo;
   private final Delimiter delimiter;
 
-  private FileImportTask(FileLineParser<T> lineParser, FileLineDataProcessor<T> dataProcessor,
-      FileInfo errorFileInfo, Delimiter delimiter) {
-    this.lineParser = lineParser;
+  public FileImportTask(
+      String importTaskName,
+      List<FormField> fieldList,
+      FormDataTransformer formDataTransformer,
+      List<ColumnValueResolver> fieldValueResolverList,
+      FormDataConverter<T> dataConverter,
+      FileLineDataProcessor<T> dataProcessor,
+      FileInfo errorFileInfo,
+      Delimiter delimiter) {
+    this.importTaskName = importTaskName;
+    this.lineParser = new FormDataFileLineParser<>(fieldList, formDataTransformer, fieldValueResolverList,
+        dataConverter);
     this.dataProcessor = dataProcessor;
     this.errorFileInfo = errorFileInfo;
     this.delimiter = delimiter;
   }
 
-  public FileImportTask(List<FormField> fieldList, FormDataConverter<T> dataConverter,
-      List<ColumnValueResolver> fieldValueResolverList, FileLineDataProcessor<T> dataProcessor,
-      FileInfo errorFileInfo, Delimiter delimiter) {
-    this(new FormDataFileLineParser<>(fieldList, dataConverter, fieldValueResolverList), dataProcessor,
+  public FileImportTask(
+      List<FormField> fieldList,
+      FormDataConverter<T> dataConverter,
+      List<ColumnValueResolver> fieldValueResolverList,
+      FileLineDataProcessor<T> dataProcessor,
+      FileInfo errorFileInfo,
+      Delimiter delimiter) {
+    this(FILE_IMPORT_TASK_NAME,
+        fieldList,
+        null,
+        fieldValueResolverList,
+        dataConverter,
+        dataProcessor,
         errorFileInfo, delimiter);
   }
 
@@ -134,20 +155,24 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
           numErrors++;
           errorWriter.processParseErrors(line, ape);
           progressPublisher.updateProgress(
-              new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
+              new FileImportProgress(importTaskName, numLines, ctr-1,
+                  numSuccesses, numErrors, numSkipped));
         } catch (ApplicationException ae) {
           numErrors++;
           errorWriter.processErrors(line, ae);
           progressPublisher.updateProgress(
-              new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
+              new FileImportProgress(importTaskName, numLines, ctr-1,
+                  numSuccesses, numErrors, numSkipped));
         }
       }
       progressPublisher.updateProgress(
-          new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
+          new FileImportProgress(importTaskName, numLines, ctr-1,
+              numSuccesses, numErrors, numSkipped));
       ctr++;
     }
     progressPublisher.updateProgress(
-        new FileImportProgress(numLines, ctr-1, numSuccesses, numErrors, numSkipped));
+        new FileImportProgress(importTaskName, numLines, ctr-1,
+            numSuccesses, numErrors, numSkipped));
 
     try {
       reader.close();
