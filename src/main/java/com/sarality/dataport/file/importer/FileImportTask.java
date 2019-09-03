@@ -136,7 +136,7 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
         continue;
       }
 
-      String[] values = line.split(delimiter.getRegularExpression());
+      String[] values = line.split(delimiter.getRegularExpression(), -1);
       List<String> rowData = Arrays.asList(values);
       if (ctr == 0) {
         lineParser.initColumns(rowData);
