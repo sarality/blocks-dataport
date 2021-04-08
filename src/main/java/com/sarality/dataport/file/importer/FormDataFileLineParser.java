@@ -77,20 +77,24 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
     ErrorCollectingFormData formData = new ErrorCollectingFormData();
     ColumnValueStore columnValueStore = new ColumnValueStore();
     int ctr = 0;
+    int maxCtr = columnNameList.size();
     boolean isEmptyRow = true;
     for (String dataValue : valueList) {
       if (isEmptyRow) {
         isEmptyRow = TextUtils.isEmpty(dataValue);
       }
-      String columnName = columnNameList.get(ctr);
-      FormField field = fieldNameMap.get(columnName);
+      // There might be values even after the columns. We want to just ignore them.
+      if (ctr < maxCtr) {
+        String columnName = columnNameList.get(ctr);
+        FormField field = fieldNameMap.get(columnName);
 
-      // Add value to ColumnValueStore
-      columnValueStore.addValue(columnName, dataValue);
+        // Add value to ColumnValueStore
+        columnValueStore.addValue(columnName, dataValue);
 
-      // Ignore fields that are not registered with the parser or will be handled by resolvers later
-      if (field != null && !resolvedColumnSet.contains(columnName)) {
-        formData.addValue(field, dataValue);
+        // Ignore fields that are not registered with the parser or will be handled by resolvers later
+        if (field != null && !resolvedColumnSet.contains(columnName)) {
+          formData.addValue(field, dataValue);
+        }
       }
       ctr++;
     }
@@ -100,7 +104,7 @@ public class FormDataFileLineParser<T> implements FileLineParser<T> {
       return null;
     }
 
-    // Tranform the form data before the Column values can be resolved
+    // Transform the form data before the Column values can be resolved
     if (transformer != null) {
       transformer.transform(formData);
 
