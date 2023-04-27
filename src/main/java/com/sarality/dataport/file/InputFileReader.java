@@ -5,8 +5,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * Reads a File with  given a filename and directoryPath
@@ -28,7 +30,8 @@ public class InputFileReader {
   }
 
   public void open() throws IOException {
-    bufferedReader = new BufferedReader(new FileReader(new File(directoryPath, fileName)));
+    bufferedReader = new BufferedReader(new InputStreamReader(
+        new FileInputStream(new File(directoryPath, fileName)), "UTF8"));
   }
 
   public void close() throws IOException {

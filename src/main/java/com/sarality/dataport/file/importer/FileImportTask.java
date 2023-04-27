@@ -82,7 +82,8 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
       logger.error("Error counting lines in input file " + inputFile.getDirectoryPath() + "/"
           + inputFile.getFileName(), e);
       return new FileImportStatus(inputFile.getFileName(), inputFile.getDirectoryPath(),
-          errorFileInfo.getFileName(), errorFileInfo.getDirectoryPath(), false, e.getMessage(), numLines, 0, 0, 0, 0);
+          errorFileInfo.getFileName(), errorFileInfo.getDirectoryPath(), false, e.getMessage(),
+          numLines, 0, 0, 0, 0);
     } finally {
       try {
         reader.close();
@@ -114,7 +115,8 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
         // DO nothing - as original status will be returned anyway.
       }
       return new FileImportStatus(inputFile.getFileName(), inputFile.getDirectoryPath(),
-          errorFileInfo.getFileName(), errorFileInfo.getDirectoryPath(), false, e.getMessage(), numLines, 0, 0, 0, 0);
+          errorFileInfo.getFileName(), errorFileInfo.getDirectoryPath(), false, e.getMessage(),
+          numLines, 0, 0, 0, 0);
     }
 
     boolean hasMoreLines = true;
@@ -155,23 +157,23 @@ public class FileImportTask<T> implements Task<FileInfo, FileImportProgress, Fil
           numErrors++;
           errorWriter.processParseErrors(line, ape);
           progressPublisher.updateProgress(
-              new FileImportProgress(importTaskName, numLines, ctr-1,
+              new FileImportProgress(importTaskName, numLines, ctr - 1,
                   numSuccesses, numErrors, numSkipped));
         } catch (ApplicationException ae) {
           numErrors++;
           errorWriter.processErrors(line, ae);
           progressPublisher.updateProgress(
-              new FileImportProgress(importTaskName, numLines, ctr-1,
+              new FileImportProgress(importTaskName, numLines, ctr - 1,
                   numSuccesses, numErrors, numSkipped));
         }
       }
       progressPublisher.updateProgress(
-          new FileImportProgress(importTaskName, numLines, ctr-1,
+          new FileImportProgress(importTaskName, numLines, ctr - 1,
               numSuccesses, numErrors, numSkipped));
       ctr++;
     }
     progressPublisher.updateProgress(
-        new FileImportProgress(importTaskName, numLines, ctr-1,
+        new FileImportProgress(importTaskName, numLines, ctr - 1,
             numSuccesses, numErrors, numSkipped));
 
     try {
