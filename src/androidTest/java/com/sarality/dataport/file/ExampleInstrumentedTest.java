@@ -1,13 +1,14 @@
 package com.sarality.dataport.file;
 
+import static junit.framework.TestCase.assertEquals;
+
 import android.content.Context;
+
 import androidx.test.InstrumentationRegistry;
 import androidx.test.runner.AndroidJUnit4;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.*;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -21,6 +22,6 @@ public class ExampleInstrumentedTest {
     // Context of the app under test.
     Context appContext = InstrumentationRegistry.getTargetContext();
 
-    assertEquals("com.sarality.file.test", appContext.getPackageName());
+    assertEquals("com.sarality.dataport.file", appContext.getPackageName());
   }
 }
